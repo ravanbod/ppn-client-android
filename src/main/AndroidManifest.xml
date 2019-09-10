@@ -1,2 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.behradrvb.ppnclient" />
+<manifest package="com.behradrvb.ppnclient">
+    <application>
+
+    </application>
+</manifest>
+
