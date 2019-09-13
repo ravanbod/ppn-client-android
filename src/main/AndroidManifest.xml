@@ -3,7 +3,9 @@
     package="com.behradrvb.ppnclient">
 
     <application>
-
+        <service
+            android:name=".ConnectionService"
+            android:enabled="true" />
     </application>
 </manifest>
 
