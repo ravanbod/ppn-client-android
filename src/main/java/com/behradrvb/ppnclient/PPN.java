@@ -1,6 +1,7 @@
 package com.behradrvb.ppnclient;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 public class PPN {
@@ -9,18 +10,32 @@ public class PPN {
     private int port;
     private boolean interiorBroadcast;
 
+    /**
+     * @param interiorBroadcast "true" if you want to use interior broadcast receiver: which run SocketService with data that was saved into sharedPreferences by app
+     */
     public PPN(Context context, String host, int port, boolean interiorBroadcast) {
         this.context = context;
         this.host = host;
         this.port = port;
-        this.interiorBroadcast = interiorBroadcast; // "true" if you want to use interior broadcast receiver: which run SocketService with data that was saved into sharedPref by app
+        this.interiorBroadcast = interiorBroadcast;
     }
 
+    /**
+     * This function runs service and saves data ...
+     */
     public void init() {
         setPreferences();
+        context.startService(
+                new Intent(context, ConnectionService.class)
+                        .putExtra("host", host)
+                        .putExtra("port", port)
+        ); //Start Connection Service
     }
 
-    private void setPreferences() { //This function saves data in SharedPreferences
+    /**
+     * This function saves data in SharedPreferences
+     */
+    private void setPreferences() {
         SharedPreferences.Editor editor = context.getSharedPreferences("PPN", Context.MODE_PRIVATE).edit();
         editor.putString("host", host);
         editor.putInt("port", port);
