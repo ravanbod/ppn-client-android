@@ -61,7 +61,6 @@ public class ConnectionService extends Service {
                 new Thread(new Input()).start();
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e("fuck", e.getMessage());
             }
         }
     }
