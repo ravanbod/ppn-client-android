@@ -14,13 +14,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ConnectionService extends Service {
-    private String host;
-    private int port;
     private Socket socket;
     private PrintWriter output;
     private InputStream input;
     private StringBuilder inputMessege;
-    private Thread ttt;
     private int BUFFER_SIZE = 1024;
 
     @Override
@@ -30,9 +27,15 @@ public class ConnectionService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        host = intent.getExtras().getString("host"); //Getting data from PPN class
-        port = intent.getExtras().getInt("port"); //Getting data from PPN class
-        new Thread(new Connection()).start(); //Start new connection
+        try {
+            new Thread(
+                    new Connection(
+                            intent.getExtras().getString("host"),
+                            intent.getExtras().getInt("port"))
+            ).start(); //Start new connection
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -40,16 +43,22 @@ public class ConnectionService extends Service {
      * Start this runnable class in thread to start new connection between application and server
      */
     private class Connection implements Runnable {
+        private String host;
+        private int port;
+
+        Connection(String host, int port) {
+            this.host = host;
+            this.port = port;
+        }
 
         @Override
         public void run() {
             try {
-                socket = new Socket(host, port);
+                socket = new Socket(this.host, this.port);
                 output = new PrintWriter(socket.getOutputStream());
                 input = socket.getInputStream();
-                Log.e("PPN Connection", "Connected to " + host + ":" + port);
-                ttt = new Thread(new Input());
-                ttt.start();
+                Log.e("PPN Connection", "Connected to " + this.host + ":" + this.port);
+                new Thread(new Input()).start();
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e("fuck", e.getMessage());
