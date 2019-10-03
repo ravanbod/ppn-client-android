@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import com.behradrvb.ppnclient.services.ConnectionService;
+
 public class PPN {
     private Context context;
     private String host;
@@ -25,11 +27,6 @@ public class PPN {
      */
     public void init() {
         setPreferences();
-        context.startService(
-                new Intent(context, ConnectionService.class)
-                        .putExtra("host", host)
-                        .putExtra("port", port)
-        ); //Start Connection Service
     }
 
     /**

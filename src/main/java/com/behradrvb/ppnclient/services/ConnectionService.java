@@ -1,4 +1,4 @@
-package com.behradrvb.ppnclient;
+package com.behradrvb.ppnclient.services;
 
 import android.app.Service;
 import android.content.Intent;
