@@ -14,9 +14,12 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ConnectionService extends Service {
-    private Socket socket;
-    private PrintWriter output;
-    private InputStream input;
+    public static boolean started = false;
+    public static Socket socket = null;
+    private Thread connectionThread;
+    private PrintWriter output = null;
+    private InputStream input = null;
+    private Thread inputThread;
     private StringBuilder inputMessege;
     private int BUFFER_SIZE = 1024;
 
@@ -26,17 +29,25 @@ public class ConnectionService extends Service {
     }
 
     @Override
+    public void onStart(Intent intent, int startId) {
+        super.onStart(intent, startId);
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
-            new Thread(
+            connectionThread = new Thread(
                     new Connection(
                             intent.getExtras().getString("host"),
                             intent.getExtras().getInt("port"))
-            ).start(); //Start new connection
+            );
+            connectionThread.start(); //Start new connection
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return super.onStartCommand(intent, flags, startId);
+        started = true;
+        Log.e("PPN Connection", "ConnectionService started.");
+        return START_STICKY;
     }
 
     /**
@@ -58,7 +69,8 @@ public class ConnectionService extends Service {
                 output = new PrintWriter(socket.getOutputStream());
                 input = socket.getInputStream();
                 Log.e("PPN Connection", "Connected to " + this.host + ":" + this.port);
-                new Thread(new Input()).start();
+                inputThread = new Thread(new Input());
+                inputThread.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -73,7 +85,6 @@ public class ConnectionService extends Service {
         @Override
         public void run() {
             Log.e("PPN Connection", "Starting to listening to server...");
-
             while (true) {
                 try {
                     inputMessege = new StringBuilder();
@@ -96,4 +107,17 @@ public class ConnectionService extends Service {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e("PPN Connection", "ConnectionService stopped!");
+        started = false;
+        try {
+            if (socket != null && socket.isConnected())
+                socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        sendBroadcast(new Intent(this, RestarterBroadcast.class));
+    }
 }
