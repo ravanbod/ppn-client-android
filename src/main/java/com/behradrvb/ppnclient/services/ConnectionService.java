@@ -108,8 +108,8 @@ public class ConnectionService extends Service {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
         Log.e("PPN Connection", "ConnectionService stopped!");
         started = false;
         try {
