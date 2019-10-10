@@ -12,19 +12,15 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class PPNConnection {
     private String host;
     private int port;
     private Socket socket = null;
-    private Thread connectionThread = null;
-    private PrintWriter output = null;
+    private OutputStream output = null;
     private InputStream input = null;
-    private Thread inputThread = null;
-    private StringBuilder inputMessege = null;
-    private int BUFFER_SIZE = 1024;
     private PPNConnectionInterface ppnConnectionInterface;
     private PPNMessagesInterface ppnMessagesInterface;
 
@@ -42,12 +38,7 @@ public class PPNConnection {
      * this function creates thread for connection to server.
      */
     public void connect() {
-        connectionThread = new Thread(
-                new Connection(
-                        host,
-                        port)
-        );
-        connectionThread.start();
+        new Thread(new Connection(host, port)).start();
     }
 
     /**
@@ -77,12 +68,11 @@ public class PPNConnection {
         public void run() {
             try {
                 socket = new Socket(this.host, this.port);
-                output = new PrintWriter(socket.getOutputStream());
+                output = socket.getOutputStream();
                 input = socket.getInputStream();
                 Log.e("PPN Connection", "Connected to " + this.host + ":" + this.port);
                 ppnConnectionInterface.OnNewConnectionEstablished();
-                inputThread = new Thread(new Input());
-                inputThread.start();
+                new Thread(new Input()).start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -99,7 +89,8 @@ public class PPNConnection {
             Log.e("PPN Connection", "Starting to listening to server...");
             while (true) {
                 try {
-                    inputMessege = new StringBuilder();
+                    StringBuilder inputMessege = new StringBuilder();
+                    int BUFFER_SIZE = 1024;
                     byte[] buffer = new byte[BUFFER_SIZE];
                     int read;
                     while ((read = input.read(buffer)) != -1) {
