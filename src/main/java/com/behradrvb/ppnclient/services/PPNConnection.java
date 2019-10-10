@@ -41,7 +41,7 @@ public class PPNConnection {
     /**
      * this function creates thread for connection to server.
      */
-    public void connect(String host, int port) {
+    public void connect() {
         connectionThread = new Thread(
                 new Connection(
                         host,

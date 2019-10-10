@@ -10,7 +10,7 @@ import com.behradrvb.ppnclient.services.PPNConnection;
 import java.io.IOException;
 
 final public class PPN {
-    private static String host;
+    private static String host = null;
     private static int port;
     private static PPNConnection ppnConnection = null;
 
@@ -47,10 +47,11 @@ final public class PPN {
                 }
             };
 
-        readPreferences(context);
+        if (host != null)
+            readPreferences(context);
         if (ppnConnection == null) {
             ppnConnection = new PPNConnection(host, port, ppnConnectionInterface, ppnMessagesInterface);
-            ppnConnection.connect(host, port);
+            ppnConnection.connect();
         }
 
     }
@@ -62,6 +63,7 @@ final public class PPN {
         if (ppnConnection != null) {
             try {
                 ppnConnection.disconnect();
+                ppnConnection = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
