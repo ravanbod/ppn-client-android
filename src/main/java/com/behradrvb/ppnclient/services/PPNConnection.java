@@ -1,9 +1,11 @@
 package com.behradrvb.ppnclient.services;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+
+import com.behradrvb.ppnclient.interfaces.PPNConnectionInterface;
+import com.behradrvb.ppnclient.interfaces.PPNMessagesInterface;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,41 +15,50 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class ConnectionService extends Service {
-    public static boolean started = false;
-    public static Socket socket = null;
-    private Thread connectionThread;
+public class PPNConnection {
+    public boolean started = false;
+    private String host;
+    private int port;
+    private Socket socket = null;
+    private Thread connectionThread = null;
     private PrintWriter output = null;
     private InputStream input = null;
-    private Thread inputThread;
-    private StringBuilder inputMessege;
+    private Thread inputThread = null;
+    private StringBuilder inputMessege = null;
     private int BUFFER_SIZE = 1024;
+    private PPNConnectionInterface ppnConnectionInterface;
+    private PPNMessagesInterface ppnMessagesInterface;
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    /**
+     * This method initializes data for prepare new connection.
+     */
+    public PPNConnection(String host, int port, @Nullable PPNConnectionInterface ppnConnectionInterface, @Nullable PPNMessagesInterface ppnMessagesInterface) {
+        this.host = host;
+        this.port = port;
+        this.ppnConnectionInterface = ppnConnectionInterface;
+        this.ppnMessagesInterface = ppnMessagesInterface;
     }
 
-    @Override
-    public void onStart(Intent intent, int startId) {
-        super.onStart(intent, startId);
+    /**
+     * this function creates thread for connection to server.
+     */
+    public void connect(String host, int port) {
+        connectionThread = new Thread(
+                new Connection(
+                        host,
+                        port)
+        );
+        connectionThread.start();
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        try {
-            connectionThread = new Thread(
-                    new Connection(
-                            intent.getExtras().getString("host"),
-                            intent.getExtras().getInt("port"))
-            );
-            connectionThread.start(); //Start new connection
-        } catch (Exception e) {
-            e.printStackTrace();
+    /**
+     * This function close connection if that is open.
+     */
+    public void disconnect() throws IOException {
+        if (started || socket.isConnected()) {
+            socket.close();
+            ppnConnectionInterface.OnConnectionClosed();
         }
-        started = true;
-        Log.e("PPN Connection", "ConnectionService started.");
-        return START_STICKY;
     }
 
     /**
@@ -69,6 +80,8 @@ public class ConnectionService extends Service {
                 output = new PrintWriter(socket.getOutputStream());
                 input = socket.getInputStream();
                 Log.e("PPN Connection", "Connected to " + this.host + ":" + this.port);
+                ppnConnectionInterface.OnNewConnectionEstablished();
+                started = true;
                 inputThread = new Thread(new Input());
                 inputThread.start();
             } catch (IOException e) {
@@ -99,7 +112,7 @@ public class ConnectionService extends Service {
                             continue;
                         }
                     }
-                    Log.e("msg", inputMessege.toString());
+                    ppnMessagesInterface.OnNewMessageReceived(inputMessege.toString());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -107,17 +120,4 @@ public class ConnectionService extends Service {
         }
     }
 
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        super.onTaskRemoved(rootIntent);
-        Log.e("PPN Connection", "ConnectionService stopped!");
-        started = false;
-        try {
-            if (socket != null && socket.isConnected())
-                socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        sendBroadcast(new Intent(this, RestarterBroadcast.class));
-    }
 }
