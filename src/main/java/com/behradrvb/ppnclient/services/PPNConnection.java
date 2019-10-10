@@ -6,6 +6,8 @@ import androidx.annotation.Nullable;
 
 import com.behradrvb.ppnclient.interfaces.PPNConnectionInterface;
 import com.behradrvb.ppnclient.interfaces.PPNMessagesInterface;
+import com.behradrvb.ppnclient.models.Message;
+import com.behradrvb.ppnclient.models.Server;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,8 +18,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 public class PPNConnection {
-    private String host;
-    private int port;
+    private Server server;
     private Socket socket = null;
     private OutputStream output = null;
     private InputStream input = null;
@@ -27,9 +28,8 @@ public class PPNConnection {
     /**
      * This method initializes data for prepare new connection.
      */
-    public PPNConnection(String host, int port, @Nullable PPNConnectionInterface ppnConnectionInterface, @Nullable PPNMessagesInterface ppnMessagesInterface) {
-        this.host = host;
-        this.port = port;
+    public PPNConnection(Server server, @Nullable PPNConnectionInterface ppnConnectionInterface, @Nullable PPNMessagesInterface ppnMessagesInterface) {
+        this.server = server;
         this.ppnConnectionInterface = ppnConnectionInterface;
         this.ppnMessagesInterface = ppnMessagesInterface;
     }
@@ -38,7 +38,7 @@ public class PPNConnection {
      * this function creates thread for connection to server.
      */
     public void connect() {
-        new Thread(new Connection(host, port)).start();
+        new Thread(new Connection(server.getHost(), server.getPort())).start();
     }
 
     /**
@@ -102,7 +102,12 @@ public class PPNConnection {
                             continue;
                         }
                     }
-                    ppnMessagesInterface.OnNewMessageReceived(inputMessege.toString());
+
+                    ppnMessagesInterface.OnNewMessageReceived(
+                            new Message(
+                                    inputMessege.toString()
+                            )
+                    );
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

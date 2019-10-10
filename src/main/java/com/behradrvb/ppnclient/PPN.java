@@ -5,21 +5,21 @@ import android.content.SharedPreferences;
 
 import com.behradrvb.ppnclient.interfaces.PPNConnectionInterface;
 import com.behradrvb.ppnclient.interfaces.PPNMessagesInterface;
+import com.behradrvb.ppnclient.models.Message;
+import com.behradrvb.ppnclient.models.Server;
 import com.behradrvb.ppnclient.services.PPNConnection;
 
 import java.io.IOException;
 
 final public class PPN {
-    private static String host = null;
-    private static int port;
+    private static Server server = null;
     private static PPNConnection ppnConnection = null;
 
     /**
      * This function saves and initializes data ...
      */
     public static void init(Context context, String host, int port) {
-        PPN.host = host;
-        PPN.port = port;
+        server = new Server(host, port);
         savePreferences(context);
     }
 
@@ -27,7 +27,7 @@ final public class PPN {
      * This function starts connection between client and server.
      */
     public static void execute(Context context, PPNConnectionInterface ppnConnectionInterface, PPNMessagesInterface ppnMessagesInterface) {
-        if (ppnConnectionInterface == null)
+        if (ppnConnectionInterface == null) //Set interface empty if user didn't init that.
             ppnConnectionInterface = new PPNConnectionInterface() {
                 @Override
                 public void OnNewConnectionEstablished() {
@@ -39,18 +39,17 @@ final public class PPN {
 
                 }
             };
-        if (ppnMessagesInterface == null)
+        if (ppnMessagesInterface == null) //Set interface empty if user didn't init that.
             ppnMessagesInterface = new PPNMessagesInterface() {
                 @Override
-                public void OnNewMessageReceived(String msg) {
+                public void OnNewMessageReceived(Message msg) {
 
                 }
             };
 
-        if (host != null)
-            readPreferences(context);
+        readPreferences(context);
         if (ppnConnection == null) {
-            ppnConnection = new PPNConnection(host, port, ppnConnectionInterface, ppnMessagesInterface);
+            ppnConnection = new PPNConnection(server, ppnConnectionInterface, ppnMessagesInterface);
             ppnConnection.connect();
         }
 
@@ -75,8 +74,8 @@ final public class PPN {
      */
     private static void savePreferences(Context context) {
         SharedPreferences.Editor editor = context.getSharedPreferences("PPN", Context.MODE_PRIVATE).edit();
-        editor.putString("host", host);
-        editor.putInt("port", port);
+        editor.putString("host", server.getHost());
+        editor.putInt("port", server.getPort());
         editor.apply();
     }
 
@@ -85,7 +84,6 @@ final public class PPN {
      */
     private static void readPreferences(Context context) {
         SharedPreferences s = context.getSharedPreferences("PPN", Context.MODE_PRIVATE);
-        host = s.getString("host", "");
-        port = s.getInt("port", 25088);
+        server = new Server(s.getString("host", ""), s.getInt("port", 25088));
     }
 }
