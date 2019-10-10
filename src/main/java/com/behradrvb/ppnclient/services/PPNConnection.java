@@ -56,6 +56,7 @@ public class PPNConnection {
     public void disconnect() throws IOException {
         if (socket.isConnected()) {
             socket.close();
+            Log.e("PPN Connection", "Connection closed.");
             ppnConnectionInterface.OnConnectionClosed();
         }
     }
