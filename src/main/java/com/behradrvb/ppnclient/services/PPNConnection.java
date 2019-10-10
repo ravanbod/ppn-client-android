@@ -16,7 +16,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class PPNConnection {
-    public boolean started = false;
     private String host;
     private int port;
     private Socket socket = null;
@@ -55,7 +54,7 @@ public class PPNConnection {
      * This function close connection if that is open.
      */
     public void disconnect() throws IOException {
-        if (started || socket.isConnected()) {
+        if (socket.isConnected()) {
             socket.close();
             ppnConnectionInterface.OnConnectionClosed();
         }
@@ -81,7 +80,6 @@ public class PPNConnection {
                 input = socket.getInputStream();
                 Log.e("PPN Connection", "Connected to " + this.host + ":" + this.port);
                 ppnConnectionInterface.OnNewConnectionEstablished();
-                started = true;
                 inputThread = new Thread(new Input());
                 inputThread.start();
             } catch (IOException e) {
