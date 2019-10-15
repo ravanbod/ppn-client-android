@@ -2,8 +2,6 @@ package com.behradrvb.ppnclient.services;
 
 import android.util.Log;
 
-import androidx.annotation.Nullable;
-
 import com.behradrvb.ppnclient.interfaces.PPNConnectionInterface;
 import com.behradrvb.ppnclient.interfaces.PPNMessagesInterface;
 import com.behradrvb.ppnclient.models.Message;
@@ -28,7 +26,7 @@ public class PPNConnection {
     /**
      * This method initializes data for prepare new connection.
      */
-    public PPNConnection(Server server, @Nullable PPNConnectionInterface ppnConnectionInterface, @Nullable PPNMessagesInterface ppnMessagesInterface) {
+    public PPNConnection(Server server, PPNConnectionInterface ppnConnectionInterface, PPNMessagesInterface ppnMessagesInterface) {
         this.server = server;
         this.ppnConnectionInterface = ppnConnectionInterface;
         this.ppnMessagesInterface = ppnMessagesInterface;
@@ -38,6 +36,7 @@ public class PPNConnection {
      * this function creates thread for connection to server.
      */
     public void connect() {
+        ppnConnectionInterface.OnTry();
         new Thread(new Connection(server.getHost(), server.getPort())).start();
     }
 

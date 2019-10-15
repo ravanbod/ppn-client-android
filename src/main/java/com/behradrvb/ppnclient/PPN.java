@@ -30,6 +30,11 @@ final public class PPN {
         if (ppnConnectionInterface == null) //Set interface empty if user didn't init that.
             ppnConnectionInterface = new PPNConnectionInterface() {
                 @Override
+                public void OnTry() {
+
+                }
+
+                @Override
                 public void OnNewConnectionEstablished() {
 
                 }
