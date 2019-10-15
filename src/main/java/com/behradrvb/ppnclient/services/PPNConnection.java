@@ -88,25 +88,27 @@ public class PPNConnection {
             Log.e("PPN Connection", "Starting to listening to server...");
             while (true) {
                 try {
-                    StringBuilder inputMessege = new StringBuilder();
+                    StringBuilder inputMessage = new StringBuilder();
                     int BUFFER_SIZE = 1024;
                     byte[] buffer = new byte[BUFFER_SIZE];
                     int read;
                     while ((read = input.read(buffer)) != -1) {
-                        inputMessege.append(new String(buffer, 0, read));
+                        inputMessage.append(new String(buffer, 0, read));
                         try {
-                            new JSONObject(inputMessege.toString()); // this cmd Checks if message is valid, breaks the loop and continues code to do something
+                            new JSONObject(inputMessage.toString()); // this cmd Checks if message is valid, breaks the loop and continues code to do something
                             break;
-                        } catch (JSONException je) {
-                            continue;
+                        } catch (JSONException ignored) {
                         }
                     }
 
                     ppnMessagesInterface.OnNewMessageReceived(
                             new Message(
-                                    inputMessege.toString()
+                                    inputMessage.toString()
                             )
                     );
+                    if (!socket.isConnected()) //Just was added for removing warning
+                        break;
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
