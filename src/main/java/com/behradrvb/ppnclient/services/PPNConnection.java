@@ -37,7 +37,7 @@ public class PPNConnection {
      */
     public void connect() {
         ppnConnectionInterface.OnTry();
-        new Thread(new Connection(server.getHost(), server.getPort())).start();
+        new Thread(new Connection(server.getHost(), server.getPort(), server.getSession_id())).start();
     }
 
     /**
@@ -57,10 +57,12 @@ public class PPNConnection {
     private class Connection implements Runnable {
         private String host;
         private int port;
+        private String session_id;
 
-        Connection(String host, int port) {
+        Connection(String host, int port, String session_id) {
             this.host = host;
             this.port = port;
+            this.session_id = session_id;
         }
 
         @Override
@@ -69,6 +71,7 @@ public class PPNConnection {
                 socket = new Socket(this.host, this.port);
                 output = socket.getOutputStream();
                 input = socket.getInputStream();
+                output.write(session_id.getBytes());
                 Log.e("PPN Connection", "Connected to " + this.host + ":" + this.port);
                 ppnConnectionInterface.OnNewConnectionEstablished();
                 new Thread(new Input()).start();

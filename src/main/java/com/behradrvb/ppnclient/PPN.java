@@ -18,8 +18,8 @@ final public class PPN {
     /**
      * This function saves and initializes data ...
      */
-    public static void init(Context context, String host, int port) {
-        server = new Server(host, port);
+    public static void init(Context context, String host, int port, String session_id) {
+        server = new Server(host, port, session_id);
         savePreferences(context);
     }
 
@@ -81,6 +81,7 @@ final public class PPN {
         SharedPreferences.Editor editor = context.getSharedPreferences("PPN", Context.MODE_PRIVATE).edit();
         editor.putString("host", server.getHost());
         editor.putInt("port", server.getPort());
+        editor.putString("session_id", server.getSession_id());
         editor.apply();
     }
 
@@ -89,6 +90,6 @@ final public class PPN {
      */
     private static void readPreferences(Context context) {
         SharedPreferences s = context.getSharedPreferences("PPN", Context.MODE_PRIVATE);
-        server = new Server(s.getString("host", ""), s.getInt("port", 25088));
+        server = new Server(s.getString("host", ""), s.getInt("port", 25088), s.getString("session_id", null));
     }
 }
