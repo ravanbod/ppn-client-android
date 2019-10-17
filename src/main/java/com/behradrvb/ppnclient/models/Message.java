@@ -13,7 +13,7 @@ public class Message {
             parsedJson = new JSONObject(data);
             title = parsedJson.getString("title");
             content = parsedJson.getString("content");
-            imageURL = parsedJson.getString("imageURL");
+            imageURL = parsedJson.getString("image_url");
         } catch (JSONException e) {
             e.printStackTrace();
         }

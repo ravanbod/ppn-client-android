@@ -103,12 +103,16 @@ public class PPNConnection {
                         } catch (JSONException ignored) {
                         }
                     }
-
-                    ppnMessagesInterface.OnNewMessageReceived(
-                            new Message(
-                                    inputMessage.toString()
-                            )
-                    );
+                    if (inputMessage.toString().isEmpty()){
+                        disconnect();
+                        break;
+                    }
+                    else
+                        ppnMessagesInterface.OnNewMessageReceived(
+                                new Message(
+                                        inputMessage.toString()
+                                )
+                        );
                     if (!socket.isConnected()) //Just was added for removing warning
                         break;
 

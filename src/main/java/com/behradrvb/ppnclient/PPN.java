@@ -18,8 +18,8 @@ final public class PPN {
     /**
      * This function saves and initializes data ...
      */
-    public static void init(Context context, String host, int port, String session_id) {
-        server = new Server(host, port, session_id);
+    public static void init(Context context, Server server) {
+        PPN.server = server;
         savePreferences(context);
     }
 
