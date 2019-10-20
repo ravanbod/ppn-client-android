@@ -1,46 +1,6 @@
 # Private Push Notification (Android side)
  ![alt text](https://user-images.githubusercontent.com/36668681/67162771-5c314700-f374-11e9-9f15-dcf200ba69bc.gif)
 
-
-## What is PPN?
-Private Push Notification (PPN) is a project that you can connect your client app to your server app and send messages as push notification to your client app from server app.
-For using of this project you have to run Server App on your server and import Client Library in your client app.
-**At this moment just Android Library (Java) is now written for the client section**.
- you can start server app on any OS which has python3.
-## Why i started this project?
-This is a fun project for me, i started this project to learning socket programming in java and python and now i want to share it with you.
-# Installing
-At first you have to run server app, [check this link](https://github.com/behradrvb/ppn-server-python)
-### Importing the module in your android app
-You have to get this module and import in your project.
-
-1. Open cmd/terminal and type `git clone https://github.com/behradrvb/ppn-client-android.git`
-2. In Android Studio go to File -> New -> Import Module
-3. Enter the address of directory of step 1
-4. Add `implementation project(path: ':ppn-client-android')` in dependencies of build.gradle (app) 
-    
-### Connecting to server
-After installing, you can connect to your server app.
-This module saves SERVER data in shared preferences. So you have to run this command at least 1 time.
-
-`PPN.init(getApplicationContext(),new Server(<server ip>,<server app port>,<session id>));`
-
-After running server app, it returns ip and port. You can use them in above command.
-
-Like this
-
->Server was launched successfully.(Sun Oct 20 18:30:37 2019)
->address:192.168.1.103:21000
->Waiting...
-
-`session_id` is a id of your user, for example user_id, user_name and etc.
-For sending push notifications you send this to server app to send a message to special client.
-
-`PPN.init()` just initializes the data. doesn't establish the connection.
-
-For establishing the connection, add this command in an activity, a service, a fragment or wherever you want.
-Note that if you run this command in activity, after closing the activity, connection will be closed.
-
 # Private Push Notification (Android side)
 ## What is PPN?
 Private Push Notification (PPN) is a project that you can connect your client app to your server app and send messages as push notification to your client app from server app.
