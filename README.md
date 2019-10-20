@@ -63,13 +63,13 @@ PPN.execute(getApplicationContext(), new PPNConnectionInterface() {
             }
         });
 ```
-OnTry function is called when system tries to connect.
+`OnTry()` function is called when system tries to connect.
 
-OnNewConnectionEstablished function is called when connection established.
+`OnNewConnectionEstablished()` function is called when connection established.
 
-OnConnectionClosed function is called called when Connection closed.
+`OnConnectionClosed()` function is called called when Connection closed.
 
-OnNewMessageReceived function is called when a message is given by server.
+`OnNewMessageReceived()` function is called when a message is given by server.
 
 `msg` object contain parsed json of server message. you can use it.
 like `msg.getTitle()` `msg.getImageURL()` `msg.getContent()` .
